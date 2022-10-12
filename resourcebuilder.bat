@@ -125,11 +125,11 @@ goto :allcycle
 :pnpm
 @echo on
 @echo.
-@echo %buildfolder%\!builddirs[%count%]! pnpm i
+@echo %buildfolder%\!builddirs[%count%]!^>pnpm i
 @echo.
 @call "pnpm" i
 @echo.
-@echo %buildfolder%\!builddirs[%count%]! pnpm build
+@echo %buildfolder%\!builddirs[%count%]!^>pnpm build
 @echo.
 @call "pnpm" build
 @echo off
@@ -140,11 +140,11 @@ goto :cycle
 :yarn
 @echo on
 @echo.
-@echo %buildfolder%\!builddirs[%count%]! yarn
+@echo %buildfolder%\!builddirs[%count%]!^>yarn
 @echo.
 @call "yarn"
 @echo.
-@echo %buildfolder%\!builddirs[%count%]! yarn build
+@echo %buildfolder%\!builddirs[%count%]!^>yarn build
 @echo.
 @call "yarn" build
 @echo off
