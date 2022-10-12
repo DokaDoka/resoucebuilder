@@ -26,13 +26,13 @@ for /d %%x in (*) do (
 echo.
 set /p choose=Choose the directory that contains what you want to build:
 
-set folder=%resources%
+set dirpath=%resources%
 
-if /i %choose% gtr 1 set folder=!options[%choose%]!
+if /i %choose% gtr 1 set dirpath=%resources%\!options[%choose%]!
 
 :dir
 
-cd %resources%%folder%
+cd %dirpath%
 
 set count=2
 set options=
