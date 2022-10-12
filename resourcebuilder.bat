@@ -11,20 +11,29 @@ set resources=%cd%
 cd %resources%
 
 set count=1
-set options=
-
-echo.
-echo %cd%
-echo [1] Current directory
+set options[1]=Current directory
 
 for /d %%x in (*) do (
    set /A count=!count!+1
    set options[!count!]=%%x
-   echo [!count!] %%x
 )
 
 echo.
+echo %cd%
+
+for /l %%x in (1,1,!count!) do (
+   echo [%%x] !options[%%x]!
+)
+
+echo.
+set choose=
 set /p choose=Choose the directory that contains what you want to build:
+set userchoice=!options[%choose%]!
+
+if not defined userchoice (
+   echo ERROR invalid input
+   goto :start
+)
 
 set dirpath=%resources%
 
@@ -35,21 +44,30 @@ if /i %choose% gtr 1 set dirpath=%resources%\!options[%choose%]!
 cd %dirpath%
 
 set count=2
-set options=
-
-echo.
-echo %cd%
-echo [1] Return
-echo [2] Build all
+set options[1]=Return
+set options[2]=Build all
 
 for /d %%x in (*) do (
    set /A count=!count!+1
    set options[!count!]=%%x
-   echo [!count!] Build %%x
 )
 
 echo.
+echo %cd%
+
+for /l %%x in (1,1,!count!) do (
+   echo [%%x] !options[%%x]!
+)
+
+echo.
+set choose=
 set /p choose=Choose option:
+set userchoice=!options[%choose%]!
+
+if not defined userchoice (
+   echo ERROR invalid input
+   goto :dir
+)
 
 if /i %choose% equ 1 goto :start
 
@@ -60,12 +78,28 @@ if /i %choose% equ 2 (
    cd %resource%
 )
 
-echo.
-echo [1] pnpm
-echo [2] yarn
+:manager
+
+set count=2
+set options[1]=pnpm
+set options[2]=yarn
 
 echo.
-set /p manager=Choose package manager:
+echo %cd%
+
+for /l %%x in (1,1,!count!) do (
+   echo [%%x] !options[%%x]!
+)
+
+echo.
+set choose=
+set /p choose=Choose package manager:
+set userchoice=!options[%choose%]!
+
+if not defined userchoice (
+   echo ERROR invalid input
+   goto :manager
+)
 
 if %resource% equ all (
    set alltotal=0
@@ -104,7 +138,7 @@ set /A count=!count!+1
 
 if exist !builddirs[%count%]!\ (
    cd !builddirs[%count%]!
-   if /i %manager% equ 1 (
+   if /i %choose% equ 1 (
       goto :pnpm
    ) else (
       goto :yarn
