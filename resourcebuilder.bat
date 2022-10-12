@@ -1,4 +1,6 @@
+@REM version 0.0.2
 @echo off
+
 title Resource Builder
 setlocal enabledelayedexpansion
 
