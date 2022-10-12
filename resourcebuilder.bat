@@ -12,8 +12,9 @@ cd %resources%
 
 set count=1
 set options=
+
 echo.
-echo Resources
+echo %cd%
 echo [1] Current directory
 
 for /d %%x in (*) do (
@@ -35,8 +36,9 @@ cd %resources%%folder%
 
 set count=2
 set options=
+
 echo.
-echo %folder%
+echo %cd%
 echo [1] Return
 echo [2] Build all
 
