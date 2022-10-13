@@ -1,4 +1,4 @@
-@REM version 0.1.0
+@REM version 0.1.1
 @echo off
 
 title Resource Builder
@@ -186,6 +186,7 @@ goto :eof
       if exist package.json (
          set /a count=!count!+1
          set options[!count!]=%%x
+         cd ..
          goto :eof
       )
       cd ..
