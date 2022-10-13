@@ -1,4 +1,4 @@
-@REM version 0.0.2
+@REM version 0.1.0
 @echo off
 
 title Resource Builder
@@ -10,32 +10,24 @@ set resources=%cd%
 @REM set resources="YOUR RESOURCES FOLDER HERE"
 
 :start
+
 cd %resources%
 
 set count=1
 set options[1]=Current directory
 
-for /d %%x in (*) do (
-   set /A count=!count!+1
-   set options[!count!]=%%x
-)
+call :loop1
 
 echo.
-echo %cd%
+cd
 
-for /l %%x in (1,1,!count!) do (
-   echo [%%x] !options[%%x]!
-)
+call :echooptions
 
 echo.
 set choose=
 set /p choose=Choose the directory that contains what you want to build:
-set userchoice=!options[%choose%]!
 
-if not defined userchoice (
-   echo ERROR invalid input
-   goto :start
-)
+call :validation :start
 
 set dirpath=%resources%
 
@@ -49,35 +41,31 @@ set count=2
 set options[1]=Return
 set options[2]=Build all
 
-for /d %%x in (*) do (
-   set /A count=!count!+1
-   set options[!count!]=%%x
-)
+call :loop1
 
 echo.
-echo %cd%
+cd
 
-for /l %%x in (1,1,!count!) do (
-   echo [%%x] !options[%%x]!
-)
+call :echooptions
 
 echo.
 set choose=
 set /p choose=Choose option:
-set userchoice=!options[%choose%]!
 
-if not defined userchoice (
-   echo ERROR invalid input
-   goto :dir
-)
+call :validation :dir
 
 if /i %choose% equ 1 goto :start
 
 if /i %choose% equ 2 (
    set resource=all
+   set buildcount=!count!
+   for /l %%x in (1,1,!count!) do (
+      set tobuild[%%x]=!options[%%x]!
+   )
 ) else (
    set resource=!options[%choose%]!
-   cd %resource%
+   set resourcename=!options[%choose%]!
+   cd !options[%choose%]!
 )
 
 :manager
@@ -87,103 +75,136 @@ set options[1]=pnpm
 set options[2]=yarn
 
 echo.
-echo %cd%
+cd
 
-for /l %%x in (1,1,!count!) do (
-   echo [%%x] !options[%%x]!
-)
+call :echooptions
 
 echo.
 set choose=
 set /p choose=Choose package manager:
-set userchoice=!options[%choose%]!
 
-if not defined userchoice (
-   echo ERROR invalid input
-   goto :manager
-)
+call :validation :manager
 
 if %resource% equ all (
-   set alltotal=0
-   set allresouces=
-
-   for /d %%x in (*) do (
-      set /A alltotal=!alltotal!+1
-      set allresouces[!alltotal!]=%%x
+   for /l %%x in (3,1,!buildcount!) do (
+      set resourcename=!tobuild[%%x]!
+      cd !tobuild[%%x]!
+      call :buildcycle
+      cd ..
    )
-   set allcount=0
-   goto :all
+   goto :start
 )
 
-set buildfolder=%resource%
-cd %resource%
+call :buildcycle
+goto :dir
 
-:allcycle
-
-set count=0
-set builddirs[1]=web
-set builddirs[2]=src
-set builddirs[3]=ui
-set builddirs[4]=phone
-set builddirs[5]=resources
-
-:cycle
-if /i %count% equ 5 (
-   if %resource% equ all (
-      goto :all
-   ) else (
-      goto :dir
+:buildcycle
+   set subfolder=
+   if exist package.json (
+      if /i %choose% equ 1 (
+         call :pnpm
+      ) else (
+         call :yarn
+      )
    )
-)
 
-set /A count=!count!+1
-
-if exist !builddirs[%count%]!\ (
-   cd !builddirs[%count%]!
-   if /i %choose% equ 1 (
-      goto :pnpm
-   ) else (
-      goto :yarn
+   for /d %%y in (*) do (
+      set subfolder=\%%y
+      cd %%y
+      if exist package.json (
+         if /i %choose% equ 1 (
+            call :pnpm
+         ) else (
+            call :yarn
+         )
+      )
+      cd ..
    )
-)
-goto :cycle
-
-:all
-if /i %allcount% equ %alltotal% goto :start
-
-if /i %allcount% gtr 0 cd ..
-
-set /A allcount=!allcount!+1
-set buildfolder=!allresouces[%allcount%]!
-cd !allresouces[%allcount%]!
-goto :allcycle
+goto :eof
 
 :pnpm
-@echo on
-@echo.
-@echo %buildfolder%\!builddirs[%count%]!^>pnpm i
-@echo.
-@call "pnpm" i
-@echo.
-@echo %buildfolder%\!builddirs[%count%]!^>pnpm build
-@echo.
-@call "pnpm" build
-@echo off
-echo.
-cd ..
-goto :cycle
+   @echo on
+   @echo.
+   @echo %resourcename%%subfolder%^>pnpm i
+   @echo.
+   @call "pnpm" i
+   @echo.
+   @echo %resourcename%%subfolder%^>pnpm build
+   @echo.
+   @call "pnpm" build
+   @echo off
+   copy /y nul ".yarn.installed"
+   echo.
+goto :eof
 
 :yarn
-@echo on
-@echo.
-@echo %buildfolder%\!builddirs[%count%]!^>yarn
-@echo.
-@call "yarn"
-@echo.
-@echo %buildfolder%\!builddirs[%count%]!^>yarn build
-@echo.
-@call "yarn" build
-@echo off
-echo.
-cd ..
-goto :cycle
+   @echo on
+   @echo.
+   @echo %resourcename%%subfolder%^>yarn
+   @echo.
+   @call "yarn"
+   @echo.
+   @echo %resourcename%%subfolder%^>yarn build
+   @echo.
+   @call "yarn" build
+   @echo off
+   copy /y nul ".yarn.installed"
+   echo.
+goto :eof
+
+:loop1
+   for /d %%x in (*) do (
+      cd %%x
+      if exist package.json (
+         set /a count=!count!+1
+         set options[!count!]=%%x
+      ) else (
+         call :loop2
+      )
+      cd ..
+   )
+goto :eof
+
+:loop2
+   for /d %%y in (*) do (
+      cd %%y
+      if exist package.json (
+         set /a count=!count!+1
+         set options[!count!]=%%x
+         cd ..
+         goto :eof
+      ) else (
+         call :loop3
+      )
+      cd ..
+   )
+goto :eof
+
+:loop3
+   for /d %%z in (*) do (
+      cd %%z
+      if exist package.json (
+         set /a count=!count!+1
+         set options[!count!]=%%x
+         goto :eof
+      )
+      cd ..
+   )
+goto :eof
+
+:echooptions
+   for /l %%x in (1,1,!count!) do (
+      echo [%%x] !options[%%x]!
+   )
+goto :eof
+
+:validation
+   if /i %choose% gtr %count% (
+      echo ERROR invalid input
+      goto %~1
+   )
+   if not defined options[%choose%] (
+      echo ERROR invalid input
+      goto %~1
+   )
+goto :eof
