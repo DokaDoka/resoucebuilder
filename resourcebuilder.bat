@@ -1,4 +1,4 @@
-@REM version 0.1.1
+@REM version 0.2.0
 @echo off
 
 title Resource Builder
