@@ -150,9 +150,13 @@ exit /b 0
             set /a count=!count!+1
             set options[!count!]=%%x
             cd ..
-            exit /b 0
+            exit /b 1
          ) else (
             call :loop2
+            if errorlevel 1 (
+               cd ..
+               exit /b 1
+            )
          )
          cd ..
       )
