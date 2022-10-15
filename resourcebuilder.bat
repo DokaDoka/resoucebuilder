@@ -42,7 +42,7 @@ set resources=%cd%
       cd !options[%choose%]!
       call :navigatemenu
    )
-goto :eof
+exit /b 0
 
 :buildmenu
    echo.
@@ -93,7 +93,7 @@ goto :eof
 
       call :managermenu
    )
-goto :eof
+exit /b 0
 
 :managermenu
    echo.
@@ -125,7 +125,7 @@ goto :eof
    )
 
    call :buildmenu
-goto :eof
+exit /b 0
 
 :loop1
    for /d %%x in (*) do (
@@ -140,7 +140,7 @@ goto :eof
          cd ..
       )
    )
-goto :eof
+exit /b 0
 
 :loop2
    for /d %%y in (*) do (
@@ -150,20 +150,20 @@ goto :eof
             set /a count=!count!+1
             set options[!count!]=%%x
             cd ..
-            goto :eof
+            exit /b 0
          ) else (
             call :loop2
          )
          cd ..
       )
    )
-goto :eof
+exit /b 0
 
 :echooptions
    for /l %%x in (1,1,!count!) do (
       echo [%%x] !options[%%x]!
    )
-goto :eof
+exit /b 0
 
 :input
    echo.
@@ -184,7 +184,7 @@ goto :eof
       echo ERROR invalid input
       goto %~1
    )
-goto :eof
+exit /b 0
 
 :build
    if !options[%choose%]!==pnpm (
@@ -206,7 +206,7 @@ goto :eof
    @echo off
    copy /y nul ".yarn.installed"
    echo.
-goto :eof
+exit /b 0
 
 :buildcycle
    set subfolder=
@@ -223,4 +223,4 @@ goto :eof
    )
 
    cd ..
-goto :eof
+exit /b 0
