@@ -129,29 +129,33 @@ goto :eof
 
 :loop1
    for /d %%x in (*) do (
-      cd %%x
-      if exist package.json (
-         set /a count=!count!+1
-         set options[!count!]=%%x
-      ) else (
-         call :loop2
+      if not %%x==node_modules (
+         cd %%x
+         if exist package.json (
+            set /a count=!count!+1
+            set options[!count!]=%%x
+         ) else (
+            call :loop2
+         )
+         cd ..
       )
-      cd ..
    )
 goto :eof
 
 :loop2
    for /d %%y in (*) do (
-      cd %%y
-      if exist package.json (
-         set /a count=!count!+1
-         set options[!count!]=%%x
+      if not %%y==node_modules (
+         cd %%y
+         if exist package.json (
+            set /a count=!count!+1
+            set options[!count!]=%%x
+            cd ..
+            goto :eof
+         ) else (
+            call :loop2
+         )
          cd ..
-         goto :eof
-      ) else (
-         call :loop2
       )
-      cd ..
    )
 goto :eof
 
