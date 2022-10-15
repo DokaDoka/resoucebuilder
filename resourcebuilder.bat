@@ -17,11 +17,11 @@ set resources=%cd%
 
    if %cd%==%resources% (
       set count=1
-      set options[1]=build
+      set options[1]=build mode
    ) else (
       set count=2
       set options[1]=return
-      set options[2]=build
+      set options[2]=build mode
    )
 
    call :loop1
@@ -35,7 +35,7 @@ set resources=%cd%
       call :navigatemenu
    )
 
-   if !options[%choose%]!==build (
+   if "!options[%choose%]!"=="build mode" (
       call :buildmenu
    ) else (
       set resourcename=!options[%choose%]!
@@ -50,12 +50,12 @@ exit /b 0
 
    if %cd%==%resources% (
       set count=2
-      set options[1]=navigate
+      set options[1]=navigate mode
       set options[2]=build all
    ) else (
       set count=3
       set options[1]=return
-      set options[2]=navigate
+      set options[2]=navigate mode
       set options[3]=build all
    )
 
@@ -70,7 +70,7 @@ exit /b 0
       call :buildmenu
    )
 
-   if !options[%choose%]!==navigate (
+   if "!options[%choose%]!"=="navigate mode" (
       call :navigatemenu
    )
 
