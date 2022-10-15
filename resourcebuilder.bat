@@ -127,45 +127,6 @@ goto :eof
    call :buildmenu
 goto :eof
 
-:buildcycle
-   set subfolder=
-   if exist package.json call :build
-
-   for /d %%y in (*) do (
-      set subfolder=\%%y
-      cd %%y
-
-      if exist package.json (
-         call :build
-      )
-      cd ..
-   )
-
-   cd ..
-goto :eof
-
-:build
-   if !options[%choose%]!==pnpm (
-      set command1=!options[%choose%]! i
-   ) else (
-      set command1=!options[%choose%]!
-   )
-   set command2=!options[%choose%]! build
-
-   @echo on
-   @echo.
-   @echo %resourcename%%subfolder%^>%command1%
-   @echo.
-   @call %command1%
-   @echo.
-   @echo %resourcename%%subfolder%^>%command2%
-   @echo.
-   @call %command2%
-   @echo off
-   copy /y nul ".yarn.installed"
-   echo.
-goto :eof
-
 :loop1
    for /d %%x in (*) do (
       cd %%x
@@ -219,4 +180,43 @@ goto :eof
       echo ERROR invalid input
       goto %~1
    )
+goto :eof
+
+:build
+   if !options[%choose%]!==pnpm (
+      set command1=!options[%choose%]! i
+   ) else (
+      set command1=!options[%choose%]!
+   )
+   set command2=!options[%choose%]! build
+
+   @echo on
+   @echo.
+   @echo %resourcename%%subfolder%^>%command1%
+   @echo.
+   @call %command1%
+   @echo.
+   @echo %resourcename%%subfolder%^>%command2%
+   @echo.
+   @call %command2%
+   @echo off
+   copy /y nul ".yarn.installed"
+   echo.
+goto :eof
+
+:buildcycle
+   set subfolder=
+   if exist package.json call :build
+
+   for /d %%y in (*) do (
+      set subfolder=\%%y
+      cd %%y
+
+      if exist package.json (
+         call :build
+      )
+      cd ..
+   )
+
+   cd ..
 goto :eof
