@@ -196,20 +196,7 @@ goto :eof
          cd ..
          goto :eof
       ) else (
-         call :loop3
-      )
-      cd ..
-   )
-goto :eof
-
-:loop3
-   for /d %%z in (*) do (
-      cd %%z
-      if exist package.json (
-         set /a count=!count!+1
-         set options[!count!]=%%x
-         cd ..
-         goto :eof
+         call :loop2
       )
       cd ..
    )
