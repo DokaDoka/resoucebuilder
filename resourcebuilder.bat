@@ -111,10 +111,8 @@ goto :eof
    if !options[%choose%]!==cancel (
       call :buildmenu
    ) else (
-      set pacman=!options[%choose%]!
-
       if /i %buildcount% gtr 0 (
-         if exist package.json call ^:%pacman%
+         if exist package.json call :build
 
          for /l %%x in (1,1,!buildcount!) do (
             set resourcename=!tobuild[%%x]!
@@ -129,14 +127,14 @@ goto :eof
 
 :buildcycle
    set subfolder=
-   if exist package.json call ^:%pacman%
+   if exist package.json call :build
 
    for /d %%y in (*) do (
       set subfolder=\%%y
       cd %%y
 
       if exist package.json (
-         call ^:%pacman%
+         call :build
       )
       cd ..
    )
@@ -144,31 +142,23 @@ goto :eof
    cd ..
 goto :eof
 
-:pnpm
-   @echo on
-   @echo.
-   @echo %resourcename%%subfolder%^>pnpm i
-   @echo.
-   @call "pnpm" i
-   @echo.
-   @echo %resourcename%%subfolder%^>pnpm build
-   @echo.
-   @call "pnpm" build
-   @echo off
-   copy /y nul ".yarn.installed"
-   echo.
-goto :eof
+:build
+   if !options[%choose%]!==pnpm (
+      set command1=!options[%choose%]! i
+   ) else (
+      set command1=!options[%choose%]!
+   )
+   set command2=!options[%choose%]! build
 
-:yarn
    @echo on
    @echo.
-   @echo %resourcename%%subfolder%^>yarn
+   @echo %resourcename%%subfolder%^>%command1%
    @echo.
-   @call "yarn"
+   @call %command1%
    @echo.
-   @echo %resourcename%%subfolder%^>yarn build
+   @echo %resourcename%%subfolder%^>%command2%
    @echo.
-   @call "yarn" build
+   @call %command2%
    @echo off
    copy /y nul ".yarn.installed"
    echo.
