@@ -123,6 +123,8 @@ goto :eof
          cd ..
       ) else call :buildcycle
    )
+
+   call :buildmenu
 goto :eof
 
 :buildcycle
